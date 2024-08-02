@@ -11,22 +11,41 @@ public class PlayerController : MonoBehaviour
     private Animator anim;
     private CapsuleCollider2D colliderPlayer;
 
+    [Header("Atributtes")]
     public float speed;
     public int addJumps;
-    public bool isGrounded;
-    public float jumpForce;
     public int life;
+    public float jumpForce;
+
+    [Header("Bool")]
+    public bool isGrounded;
+    [HideInInspector] public bool isPause;
+
+    [Header("UI")]
     public TextMeshProUGUI textLife;
-    public string levelName;
+
+    [Header("GameObjects")]
     public GameObject gameOver;
     public GameObject canvasPause;
-    public bool isPause;
+
+    [Header("Level")]
+    public string levelName;
+
+    private void Awake()
+    {
+        if (PlayerPrefs.GetInt("wasLoaded") == 1)
+        {
+            life = PlayerPrefs.GetInt("Life", 0);
+            Debug.Log("Game loaded");
+        }
+    }
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         colliderPlayer = GetComponent<CapsuleCollider2D>();
+        Time.timeScale = 1f;
     }
 
     void Update()
@@ -61,6 +80,7 @@ public class PlayerController : MonoBehaviour
         {
             anim.Play("Die", -1);
             this.enabled = false;
+            rb.velocity = Vector2.zero;
             colliderPlayer.enabled = false;
             rb.gravityScale = 0;
             gameOver.SetActive(true);
@@ -70,6 +90,14 @@ public class PlayerController : MonoBehaviour
         {
             PauseScreen();
         }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            string activeScene = SceneManager.GetActiveScene().name;
+            PlayerPrefs.SetString("LevelSaved", activeScene);
+            PlayerPrefs.SetInt("Life", life);
+            Debug.Log("Game saved");
+        }
     }
 
     void FixedUpdate()
@@ -77,6 +105,7 @@ public class PlayerController : MonoBehaviour
         Move();
     }
 
+    #region Move
     void Move()
     {
         rb.velocity = new Vector2(moveX * speed, rb.velocity.y);
@@ -97,6 +126,7 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("IsRun", false);
         }
     }
+    #endregion
 
     void Attack()
     {

@@ -7,8 +7,9 @@ public class MainMenu : MonoBehaviour
 {
     public void PlayGame()
     {
+        LoadGame.Instance.wasLoaded = false;
+        PlayerPrefs.DeleteAll();
         SceneManager.LoadScene(1);
-        Time.timeScale = 1f;
     }
 
     public void ExitGame()
